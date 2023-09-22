@@ -12,7 +12,7 @@ help() {
     echo "    -p,                  Execute a previous temporary file [using the number]."
     echo ""
     echo "Examples:"
-    echo "    ./crun  "
+    echo "    ./crun mine.sh"
     echo "    ./crun -v"
     echo "    ./crun python -p 2"
     echo ""
