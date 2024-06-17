@@ -1,7 +1,11 @@
 #!/bin/bash
 
 MAX_TEMPS=5
-WORKING_DIR=$(dirname -- "$(readlink -f -- "$0";)";)
+WORKING_DIR=$(dirname -- "$(readlink -f -- "$0")")/crun/
+
+if [ ! -d "$WORKING_DIR" ]; then
+    mkdir "$WORKING_DIR"
+fi
 
 help() {
     echo "Usage: ./crun <exec-command> [<-h/-v/-c/-p>]"
@@ -24,7 +28,11 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-if [[ $1 == *".sh"* ]]; then
+if [[ -z $1 ]]; then
+    echo "That command can not be found."
+    exit 1
+
+elif [[ $1 == *".sh"* ]]; then
     if [ -f "$WORKING_DIR/$1" ]; then
         cmd=$WORKING_DIR/$1
         ((OPTIND++))
@@ -33,14 +41,12 @@ if [[ $1 == *".sh"* ]]; then
         exit 1
     fi
 
-elif ! [[ $1 == *"-"* ]]; then
-    if [ -x "$(command -v $1)" ]; then
-        cmd=$1
-        ((OPTIND++))
-    else
-        echo "That command can not be found."
-        exit 1
-    fi
+elif [ -x "$(command -v $1)" ]; then
+    cmd=$1
+    ((OPTIND++))
+else
+    echo "That command can not be found."
+    exit 1
 fi
 
 while getopts ":hvcp:" flag; do
@@ -72,6 +78,7 @@ while getopts ":hvcp:" flag; do
             i=${OPTARG}
             if [ -f "$WORKING_DIR/temp$i.crun" ]; then
                 vi $WORKING_DIR/temp$i.crun
+		echo $cmd
                 $cmd $WORKING_DIR/temp$i.crun
                 exit 0
             else
